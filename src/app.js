@@ -9,7 +9,7 @@ const app = express();
 app.set('views',path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 //tell express how to find our static directory nad how to serve those files 
-app.use(express.static((path.join__dirname,'public')));
+app.use(express.static(path.join(__dirname,'public')));
 
 //render
 app.get('/', (req, res ) => res.render('index', {title: 'Index'}));
