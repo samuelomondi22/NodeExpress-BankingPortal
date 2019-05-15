@@ -3,6 +3,7 @@ const fs = require('fs');
 //configure absolute paths
 const path = require('path');
 const express = require('express');
+const { accounts, users, writeJSON } = require('./data')
 
 const app = express();
 //where our views can be found
@@ -18,19 +19,6 @@ app.use(express.static(path.join(__dirname,'public')));
 
 app.use(express.urlencoded({ extended: true }));
 
-//readFileSync() is synchronous and blocks execution until finished. doesnt take a call back
-//readFile() are asynchronous and return immediately while they function in the background. takes a callback(function argument)
-const accountData = fs.readFileSync(
-    path.join(__dirname, 'json', 'accounts.json'), 'utf8'
-);
-//parse takes string and returns as a javascript object
-//The JSON.parse() method parses a JSON string, constructing the JavaScript value or object described by the string
-const accounts = JSON.parse(accountData);
-
-const userData = fs.readFileSync(
-    path.join(__dirname, 'json', 'users.json'), 'utf8'
-);
-const users = JSON.parse(userData);
 
 //render
 //http GET retrieves info from server
@@ -54,8 +42,7 @@ app.get('/transfer', (req, res ) => res.render('transfer'));
 app.post('/transfer', (req, res) =>{
     accounts[req.body.from].balance = accounts[req.body.from].balance - req.body.amount
     accounts[req.body.to].balance = parseInt(accounts[req.body.to].balance) + parseInt(req.body.amount, 10)
-    const accountsJSON = JSON.stringify(accounts, null, 4);
-    fs.writeFileSync(path.join(__dirname, 'json/accounts.json'), accountsJSON, 'utf8')
+    writeJSON();
     res.render('transfer', {message: 'Transfer Completed'})
 })
 
@@ -63,8 +50,7 @@ app.get('/payment', (req, res ) => res.render('payment', { account: accounts.cre
 app.post('/payment', (req, res ) => {
     accounts.credit.balance -= req.body.amount;
     accounts.credit.available += parseInt(req.body.amount, 10);
-    const accountsJSON = JSON.stringify(accounts, null, 4);
-    fs.writeFileSync(path.join(__dirname, 'json', 'accounts.json'), accountsJSON, 'utf8');
+    writeJSON();
     res.render('payment', { message: 'Payment Successful', account: accounts.credit })
 })
 
